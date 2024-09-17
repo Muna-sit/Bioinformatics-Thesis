@@ -1,0 +1,3 @@
+-> Open VScode terminal
+-> python -m venv env
+-> .\env\Scripts\activate
