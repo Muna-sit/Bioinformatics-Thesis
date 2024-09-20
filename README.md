@@ -1,3 +1,5 @@
 -> Open VScode terminal
 -> python -m venv env
 -> .\env\Scripts\activate
+-> cd Llama3.1
+-> pip install Ollama
