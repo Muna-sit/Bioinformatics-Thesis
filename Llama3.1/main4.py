@@ -6,7 +6,7 @@ def llama_predict(question, options):
     prompt = f"Q: {question}\n"
     for key, value in options.items():
         prompt += f"{key}: {value}\n"
-    prompt += "Answer with the letter only (A, B, C, or D)."
+    prompt += "Answer with only one of the letters (A, B, C, or D). Be sure to carefully consider all options."
 
     
     response = ollama.chat(
