@@ -6,7 +6,7 @@ from langchain.embeddings import HuggingFaceEmbeddings
 import json
 
 
-loader = PyPDFLoader("Neonatal.pdf")
+loader = PyPDFLoader("Fullbook.pdf")
 documents = loader.load()
 
 
@@ -21,7 +21,6 @@ db = Chroma.from_documents(documents, embedding_function)
 file_path = 'EnglishTest.jsonl'
 with open(file_path, 'r') as f:
     data = [json.loads(line) for line in f]
-
 
 def get_model_answer(question, options):
     prompt = f"Q: {question}\n"
@@ -40,29 +39,29 @@ def get_model_answer(question, options):
 results = []
 
 
-score_threshold = 0.5 
 for entry in data:
     question = entry['question']
     options = entry['options']
     correct_answer_key = entry['answer_idx']
 
-  
     extended_query = f"{question}\nOptions: " + ", ".join([f"{key}: {value}" for key, value in options.items()])
 
- 
     retrieved_results = db.similarity_search(extended_query)
 
-   
-    if retrieved_results and retrieved_results[0].score >= score_threshold:
-        retrieved_content = retrieved_results[0].page_content  
-        results.append((retrieved_content, correct_answer_key))  
+    if retrieved_results:
+        retrieved_content = retrieved_results[0].page_content 
+      
+        predicted_answer = get_model_answer(question, options)
+        correct_answer = correct_answer_key 
+        results.append((retrieved_content, predicted_answer, correct_answer))  
     else:
-       
-        answer = get_model_answer(question, options)
-        results.append(("No relevant information found.", answer))  
-
+        predicted_answer = get_model_answer(question, options)
+        correct_answer = correct_answer_key  
+        results.append(("No relevant information found.", predicted_answer, correct_answer))  
 
 with open('output.txt', 'w') as f:
-    for retrieved_content, answer in results:
+    for retrieved_content, predicted_answer, correct_answer in results:
         f.write(f"Retrieved Content: {retrieved_content}\n")
-        f.write(f"Predicted Answer: {answer}\n\n")
+        f.write(f"Predicted Answer: {predicted_answer}\n")
+        f.write(f"Correct Answer: {correct_answer}\n\n")
+
